@@ -1,6 +1,15 @@
 <?php
-if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-    exit;
-}
+defined('WP_UNINSTALL_PLUGIN') || exit;
 
-// Optional: delete plugin options or custom tables here
+global $wpdb;
+
+$tables = [
+    "{$wpdb->prefix}careplan_participants",
+    "{$wpdb->prefix}careplan_plans",
+    "{$wpdb->prefix}careplan_goals",
+    "{$wpdb->prefix}careplan_notes",
+];
+
+foreach ($tables as $table) {
+    $wpdb->query("DROP TABLE IF EXISTS $table");
+}

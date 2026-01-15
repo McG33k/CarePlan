@@ -11,22 +11,54 @@
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
+
 defined( 'ABSPATH' ) || exit;
 
-// Plugin constants.
+/**
+ * ---------------------------------------------------------
+ * Plugin Constants
+ * ---------------------------------------------------------
+ */
 define( 'CAREPLAN_VERSION', '0.1.0' );
+define( 'CAREPLAN_FILE', __FILE__ );
 define( 'CAREPLAN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CAREPLAN_URL', plugin_dir_url( __FILE__ ) );
 
-// Core includes.
+/**
+ * ---------------------------------------------------------
+ * Core Includes
+ * ---------------------------------------------------------
+ */
+
+// Activation / Deactivation
+require_once CAREPLAN_PATH . 'includes/class-careplan-activator.php';
+require_once CAREPLAN_PATH . 'includes/class-careplan-deactivator.php';
+
+// Core Plugin Class
 require_once CAREPLAN_PATH . 'includes/class-careplan.php';
+
+// Internationalization
 require_once CAREPLAN_PATH . 'includes/class-careplan-i18n.php';
-require_once CAREPLAN_PATH . 'includes/class-careplan-cpt.php';
-require_once CAREPLAN_PATH . 'includes/class-careplan-admin.php';
 
-// Activation / Deactivation.
-register_activation_hook( __FILE__, [ 'CarePlan', 'activate' ] );
-register_deactivation_hook( __FILE__, [ 'CarePlan', 'deactivate' ] );
+// Admin functionality
+require_once CAREPLAN_PATH . 'includes/admin/class-careplan-admin.php';
 
-// Initialize plugin.
-add_action( 'plugins_loaded', [ 'CarePlan', 'init' ] );
+/**
+ * ---------------------------------------------------------
+ * Activation Hooks
+ * ---------------------------------------------------------
+ */
+register_activation_hook( CAREPLAN_FILE, [ 'CarePlan_Activator', 'activate' ] );
+register_deactivation_hook( CAREPLAN_FILE, [ 'CarePlan_Deactivator', 'deactivate' ] );
+
+/**
+ * ---------------------------------------------------------
+ * Plugin Bootstrap
+ * ---------------------------------------------------------
+ */
+function run_careplan() {
+    $plugin = new CarePlan();
+    $plugin->run();
+}
+
+add_action( 'plugins_loaded', 'run_careplan' );
