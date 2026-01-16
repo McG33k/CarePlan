@@ -1,0 +1,71 @@
+/* admin.css - CarePlan Admin Styles */
+
+.wrap h1 {
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.page-title-action {
+    margin-top: -10px;
+    margin-bottom: 20px;
+}
+
+.careplan-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.careplan-table th,
+.careplan-table td {
+    padding: 10px;
+    text-align: left;
+}
+
+.careplan-table th {
+    background-color: #f1f1f1;
+}
+
+.careplan-table tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+.notice {
+    padding: 15px;
+    margin: 10px 0;
+}
+
+.notice-success {
+    border-left: 4px solid #46b450;
+    background-color: #dff0d8;
+}
+
+.notice-error {
+    border-left: 4px solid #dc3232;
+    background-color: #f8d7da;
+}
+
+.form-table th {
+    width: 200px;
+    vertical-align: top;
+    padding-top: 10px;
+}
+
+.form-table input.regular-text {
+    width: 300px;
+    padding: 5px;
+}
+
+button,
+input[type="submit"] {
+    background-color: #0085ba;
+    border: none;
+    color: white;
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+button:hover,
+input[type="submit"]:hover {
+    background-color: #0073aa;
+}

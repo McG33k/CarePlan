@@ -45,7 +45,7 @@ require_once CAREPLAN_PATH . 'includes/admin/class-careplan-admin.php';
 
 /**
  * ---------------------------------------------------------
- * Activation Hooks
+ * Activation / Deactivation Hooks
  * ---------------------------------------------------------
  */
 register_activation_hook( CAREPLAN_FILE, [ 'CarePlan_Activator', 'activate' ] );
@@ -60,5 +60,17 @@ function run_careplan() {
     $plugin = new CarePlan();
     $plugin->run();
 }
-
 add_action( 'plugins_loaded', 'run_careplan' );
+
+/**
+ * ---------------------------------------------------------
+ * Admin Initialization
+ * ---------------------------------------------------------
+ */
+function run_careplan_admin() {
+    if ( is_admin() && class_exists( 'CarePlan_Admin' ) ) {
+        $admin = new CarePlan_Admin(); 
+    }
+}
+add_action( 'admin_init', 'run_careplan_admin' );
+

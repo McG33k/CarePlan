@@ -1,6 +1,29 @@
+<?php
+defined('ABSPATH') || exit;
+
+// Capability check
+if (!current_user_can('manage_careplan')) {
+    wp_die(__('You do not have permission to access this page.', 'careplan'));
+}
+
+// Get sanitized ID
+$participant_id = intval($_GET['id'] ?? 0);
+
+// Load participant if editing
+$participant = null;
+if ($participant_id) {
+    $participant = $this->participants_repo->get_participant($participant_id);
+    if (!$participant) {
+        echo '<div class="notice notice-error"><p>' . __('Participant not found.', 'careplan') . '</p></div>';
+        return;
+    }
+}
+?>
+
 <div class="wrap">
-    <h1><?php _e('Add / Edit Participant', 'careplan'); ?></h1>
-    <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
+    <h1><?php echo $participant_id ? esc_html__('Edit Participant', 'careplan') : esc_html__('Add Participant', 'careplan'); ?></h1>
+
+    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
         <?php wp_nonce_field('careplan_save_participant'); ?>
         <input type="hidden" name="action" value="careplan_save_participant">
         <input type="hidden" name="id" value="<?php echo esc_attr($participant->id ?? 0); ?>">
