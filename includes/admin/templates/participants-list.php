@@ -21,20 +21,44 @@ if (!current_user_can('manage_options')) {
 <script>
 jQuery(document).ready(function($){
     $('.careplan-table').DataTable({
-        responsive: true,
-        pageLength: 10,
-        dom: 'Bfrtip',
-        buttons: [
-            'copyHtml5',
-            'excelHtml5',
-            'csvHtml5',
-            'pdfHtml5',
-            {
-                extend: 'print',
-                title: '<?php echo esc_js(__('Participants', 'careplan')); ?>'
+    responsive: true,
+    pageLength: 10,
+    dom: 'Bfrtip',
+    buttons: [
+        {
+            extend: 'copyHtml5',
+            exportOptions: {
+                columns: ':not(:last-child)'
             }
-        ]
-    });
+        },
+        {
+            extend: 'excelHtml5',
+            exportOptions: {
+                columns: ':not(:last-child)'
+            }
+        },
+        {
+            extend: 'csvHtml5',
+            exportOptions: {
+                columns: ':not(:last-child)'
+            }
+        },
+        {
+            extend: 'pdfHtml5',
+            exportOptions: {
+                columns: ':not(:last-child)'
+            }
+        },
+        {
+            extend: 'print',
+            title: '<?php echo esc_js(__('Participants', 'careplan')); ?>',
+            exportOptions: {
+                columns: ':not(:last-child)'
+            }
+        }
+    ]
+});
+
 });
 </script>
 

@@ -3,52 +3,16 @@ defined('ABSPATH') || exit;
 
 require_once CAREPLAN_PATH . 'includes/repositories/class-careplan-repo.php';
 
-<<<<<<< HEAD
-class CarePlan_Participants_Repo extends CarePlan_Repo {
-
-    public function __construct() {
-        parent::__construct();
-        $this->table = $this->wpdb->prefix . 'careplan_participants';
-    }
-
-    public function create_participant($data) {
-        $defaults = [
-            'user_id' => 0,
-            'first_name' => '',
-            'last_name' => '',
-            'ndis_number' => '',
-            'date_of_birth' => null,
-        ];
-        $data = wp_parse_args($data, $defaults);
-        return $this->insert($data, ['%d','%s','%s','%s','%s']);
-    }
-
-    public function update_participant($id, $data) {
-        return $this->update($data, ['id' => $id], ['%d','%s','%s','%s','%s'], ['%d']);
-    }
-
-    public function delete_participant($id) {
-        return $this->delete(['id' => $id], ['%d']);
-    }
-
-    public function get_participant($id) {
-        return $this->get(['id' => $id]);
-    }
-
-    public function get_all_participants() {
-        return $this->get_all();
-=======
 /**
  * Repository for CarePlan Participants
  */
 class CarePlan_Participants_Repo extends CarePlan_Repo {
 
     public function __construct() {
-    global $wpdb;
-    $this->wpdb  = $wpdb;
-    $this->table = $this->wpdb->prefix . 'careplan_participants';
-}
-
+        global $wpdb;
+        $this->wpdb  = $wpdb;
+        $this->table = $this->wpdb->prefix . 'careplan_participants';
+    }
 
     /**
      * Create a new participant
@@ -57,12 +21,12 @@ class CarePlan_Participants_Repo extends CarePlan_Repo {
      * @return int|false Insert ID on success, false on failure
      */
     public function create_participant( $data ) {
+
         $defaults = [
-            'user_id'      => 0,
-            'first_name'   => '',
-            'last_name'    => '',
-            'ndis_number'  => '',
-            'date_of_birth'=> null,
+            'first_name'    => '',
+            'last_name'     => '',
+            'ndis_number'   => '',
+            'date_of_birth' => null,
         ];
 
         $data = wp_parse_args( $data, $defaults );
@@ -71,10 +35,14 @@ class CarePlan_Participants_Repo extends CarePlan_Repo {
         $data['first_name']    = sanitize_text_field( $data['first_name'] );
         $data['last_name']     = sanitize_text_field( $data['last_name'] );
         $data['ndis_number']   = sanitize_text_field( $data['ndis_number'] );
-        $data['date_of_birth'] = sanitize_text_field( $data['date_of_birth'] );
-        $data['user_id']       = absint( $data['user_id'] );
+        $data['date_of_birth'] = ! empty( $data['date_of_birth'] )
+            ? sanitize_text_field( $data['date_of_birth'] )
+            : null;
 
-        return $this->insert( $data, ['%d','%s','%s','%s','%s'] );
+        return $this->insert(
+            $data,
+            ['%s', '%s', '%s', '%s']
+        );
     }
 
     /**
@@ -104,7 +72,18 @@ class CarePlan_Participants_Repo extends CarePlan_Repo {
             $data['user_id'] = absint( $data['user_id'] );
         }
 
-        return $this->update( $data, ['id' => $id], ['%d','%s','%s','%s','%s'], ['%d'] );
+        // ✅ Dynamically build correct formats (prevents string → 0 bugs)
+        $formats = [];
+        foreach ( $data as $value ) {
+            $formats[] = is_int( $value ) ? '%d' : '%s';
+        }
+
+        return $this->update(
+            $data,
+            ['id' => $id],
+            $formats,
+            ['%d']
+        );
     }
 
     /**
@@ -138,6 +117,5 @@ class CarePlan_Participants_Repo extends CarePlan_Repo {
     public function get_all_participants() {
         $results = $this->get_all();
         return $results ?: [];
->>>>>>> 7ad5afa (Update Phase 1 structure)
     }
 }

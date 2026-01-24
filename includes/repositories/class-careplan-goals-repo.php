@@ -9,11 +9,10 @@ require_once CAREPLAN_PATH . 'includes/repositories/class-careplan-repo.php';
 class CarePlan_Goals_Repo extends CarePlan_Repo {
 
     public function __construct() {
-    global $wpdb;
-    $this->wpdb  = $wpdb;
-    $this->table = $this->wpdb->prefix . 'careplan_goals';
-}
-
+        global $wpdb;
+        $this->wpdb  = $wpdb;
+        $this->table = $this->wpdb->prefix . 'careplan_goals';
+    }
 
     /**
      * Create a new goal
@@ -21,55 +20,51 @@ class CarePlan_Goals_Repo extends CarePlan_Repo {
      * @param array $data
      * @return int|false Insert ID on success, false on failure
      */
-    public function create_goal( $data ) {
+    public function create_goal($data) {
         $defaults = [
-            'participant_id'   => 0,
+            'plan_id'          => 0,
             'goal_title'       => '',
             'goal_description' => '',
             'priority'         => 0,
             'status'           => 'open',
         ];
 
-        $data = wp_parse_args( $data, $defaults );
+        $data = wp_parse_args($data, $defaults);
 
-        // Sanitize inputs
-        $data['participant_id']   = absint( $data['participant_id'] );
-        $data['goal_title']       = sanitize_text_field( $data['goal_title'] );
-        $data['goal_description'] = sanitize_textarea_field( $data['goal_description'] );
-        $data['priority']         = intval( $data['priority'] );
-        $data['status']           = sanitize_text_field( $data['status'] );
+        // Sanitize
+        $data['plan_id']          = absint($data['plan_id']);
+        $data['goal_title']       = sanitize_text_field($data['goal_title']);
+        $data['goal_description'] = sanitize_textarea_field($data['goal_description']);
+        $data['priority']         = intval($data['priority']);
+        $data['status']           = sanitize_text_field($data['status']);
 
-        return $this->insert( $data, ['%d','%s','%s','%d','%s'] );
+        // Format array matches the fields order
+        $format = ['%d', '%s', '%s', '%d', '%s'];
+
+        return $this->insert($data, $format);
     }
 
     /**
-     * Update goal by ID
+     * Update an existing goal
      *
      * @param int $id
      * @param array $data
-     * @return int|false Number of rows affected or false
+     * @return int|false Rows affected or false
      */
-    public function update_goal( $id, $data ) {
-        $id = absint( $id );
+    public function update_goal($id, $data) {
+        $id = absint($id);
 
-        // Sanitize inputs if set
-        if ( isset( $data['participant_id'] ) ) {
-            $data['participant_id'] = absint( $data['participant_id'] );
-        }
-        if ( isset( $data['goal_title'] ) ) {
-            $data['goal_title'] = sanitize_text_field( $data['goal_title'] );
-        }
-        if ( isset( $data['goal_description'] ) ) {
-            $data['goal_description'] = sanitize_textarea_field( $data['goal_description'] );
-        }
-        if ( isset( $data['priority'] ) ) {
-            $data['priority'] = intval( $data['priority'] );
-        }
-        if ( isset( $data['status'] ) ) {
-            $data['status'] = sanitize_text_field( $data['status'] );
-        }
+        if (isset($data['plan_id'])) $data['plan_id'] = absint($data['plan_id']);
+        if (isset($data['goal_title'])) $data['goal_title'] = sanitize_text_field($data['goal_title']);
+        if (isset($data['goal_description'])) $data['goal_description'] = sanitize_textarea_field($data['goal_description']);
+        if (isset($data['priority'])) $data['priority'] = intval($data['priority']);
+        if (isset($data['status'])) $data['status'] = sanitize_text_field($data['status']);
 
-        return $this->update( $data, ['id' => $id], ['%d','%s','%s','%d','%s'], ['%d'] );
+        $format = ['%d', '%s', '%s', '%d', '%s'];
+        $where  = ['id' => $id];
+        $where_format = ['%d'];
+
+        return $this->update($data, $where, $format, $where_format);
     }
 
     /**
@@ -78,9 +73,9 @@ class CarePlan_Goals_Repo extends CarePlan_Repo {
      * @param int $id
      * @return int|false Rows affected or false
      */
-    public function delete_goal( $id ) {
-        $id = absint( $id );
-        return $this->delete( ['id' => $id], ['%d'] );
+    public function delete_goal($id) {
+        $id = absint($id);
+        return $this->delete(['id' => $id], ['%d']);
     }
 
     /**
@@ -89,25 +84,22 @@ class CarePlan_Goals_Repo extends CarePlan_Repo {
      * @param int $id
      * @return object|null
      */
-    public function get_goal( $id ) {
-        $id = absint( $id );
-        $result = $this->get( ['id' => $id] );
+    public function get_goal($id) {
+        $id = absint($id);
+        $result = $this->get(['id' => $id]);
         return $result ?: null;
     }
 
     /**
      * Get all goals
      *
-     * @param int|null $participant_id Optional participant ID filter
+     * @param int|null $plan_id Optional plan ID filter
      * @return array Array of goal objects
      */
-    public function get_all_goals( $participant_id = null ) {
-        if ( $participant_id ) {
-            $participant_id = absint( $participant_id );
-            $results = $this->get_all( ['participant_id' => $participant_id] );
-        } else {
-            $results = $this->get_all();
+    public function get_all_goals($plan_id = null) {
+        if ($plan_id) {
+            return $this->get_all(['plan_id' => absint($plan_id)]) ?: [];
         }
-        return $results ?: [];
+        return $this->get_all() ?: [];
     }
 }

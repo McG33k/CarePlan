@@ -29,7 +29,6 @@ define( 'CAREPLAN_URL', plugin_dir_url( __FILE__ ) );
  * Core Includes
  * ---------------------------------------------------------
  */
-
 // Activation / Deactivation
 require_once CAREPLAN_PATH . 'includes/class-careplan-activator.php';
 require_once CAREPLAN_PATH . 'includes/class-careplan-deactivator.php';
@@ -40,8 +39,32 @@ require_once CAREPLAN_PATH . 'includes/class-careplan.php';
 // Internationalization
 require_once CAREPLAN_PATH . 'includes/class-careplan-i18n.php';
 
-// Admin functionality
+/**
+ * ---------------------------------------------------------
+ * Repositories (must load before admin)
+ * ---------------------------------------------------------
+ */
+require_once CAREPLAN_PATH . 'includes/repositories/class-careplan-repo.php';
+require_once CAREPLAN_PATH . 'includes/repositories/class-careplan-participants-repo.php';
+require_once CAREPLAN_PATH . 'includes/repositories/class-careplan-plans-repo.php';
+require_once CAREPLAN_PATH . 'includes/repositories/class-careplan-goals-repo.php';
+require_once CAREPLAN_PATH . 'includes/repositories/class-careplan-notes-repo.php';
+
+/**
+ * ---------------------------------------------------------
+ * Admin functionality
+ * ---------------------------------------------------------
+ */
 require_once CAREPLAN_PATH . 'includes/admin/class-careplan-admin.php';
+
+/**
+ * ---------------------------------------------------------
+ * Frontend functionality
+ * ---------------------------------------------------------
+ */
+if ( ! is_admin() ) {
+    require_once CAREPLAN_PATH . 'includes/class-careplan-frontend.php';
+}
 
 /**
  * ---------------------------------------------------------
@@ -53,24 +76,30 @@ register_deactivation_hook( CAREPLAN_FILE, [ 'CarePlan_Deactivator', 'deactivate
 
 /**
  * ---------------------------------------------------------
- * Plugin Bootstrap
+ * Plugin Bootstrap (Core, Admin, Frontend)
  * ---------------------------------------------------------
  */
-function run_careplan() {
-    $plugin = new CarePlan();
-    $plugin->run();
-}
-add_action( 'plugins_loaded', 'run_careplan' );
-
-/**
- * ---------------------------------------------------------
- * Admin Initialization
- * ---------------------------------------------------------
- */
-function run_careplan_admin() {
-    if ( is_admin() && class_exists( 'CarePlan_Admin' ) ) {
-        $admin = new CarePlan_Admin(); 
+add_action( 'plugins_loaded', function() {
+    // Core plugin
+    if ( class_exists( 'CarePlan' ) ) {
+        $plugin = new CarePlan();
+        $plugin->run();
     }
-}
-add_action( 'admin_init', 'run_careplan_admin' );
 
+    // Admin
+    if ( is_admin() && class_exists( 'CarePlan_Admin' ) ) {
+        new CarePlan_Admin();
+    }
+
+    // Frontend
+    if ( ! is_admin() && class_exists( 'CarePlan_Frontend' ) ) {
+        new CarePlan_Frontend();
+    }
+
+    /* Load Shortcodes */
+    require_once CAREPLAN_PATH . 'includes/shortcodes/class-careplan-shortcodes.php';
+    new CarePlan_Shortcodes();
+
+
+
+});
